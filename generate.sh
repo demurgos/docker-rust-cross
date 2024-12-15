@@ -20,6 +20,14 @@ const targets = [
     name: "x86_64-unknown-linux-musl",
     image: "x86_64-unknown-linux-musl"
   },
+  {
+    name: "aarch64-unknown-linux-gnu",
+    image: "aarch64-unknown-linux-gnu"
+  },
+  {
+    name: "aarch64-apple-darwin",
+    image: "aarch64-apple-darwin-cross"
+  },
 ]
 
 for target in (targets) {
@@ -28,7 +36,7 @@ for target in (targets) {
   echo "generating $name"
   cd $SCRIPT_DIR {
     cd cross {
-      if (name === "x86_64-apple-darwin") {
+      if (name === "x86_64-apple-darwin" || name === "aarch64-apple-darwin") {
         cargo build-docker-image "${image}" --tag local --engine docker --build-arg "MACOS_SDK_URL=https://github.com/joseluisq/macosx-sdks/releases/download/10.15/MacOSX10.15.sdk.tar.xz"
       } else {
         cargo build-docker-image "${image}" --tag local --engine docker
@@ -42,6 +50,9 @@ for target in (targets) {
         ENV CXX_x86_64_apple_darwin="x86_64-apple-darwin19-clang++"
         ENV CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER=x86_64-apple-darwin19-clang
         """
+      }
+      if (name === "aarch64-apple-darwin") {
+        # TODO: which env vars are needed, if any?
       }
     }
     mkdir -p "guest-${name}"
